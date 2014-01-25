@@ -9,6 +9,10 @@ open Fake.AssemblyInfoFile
 open Fake.ReleaseNotesHelper
 open System
 
+let buildDir = "build/"
+let testDir  = "test/"
+let tempDir  = "temp/"
+
 // --------------------------------------------------------------------------------------
 // START TODO: Provide project-specific details below
 // --------------------------------------------------------------------------------------
@@ -21,32 +25,32 @@ open System
 
 // The name of the project 
 // (used by attributes in AssemblyInfo, name of a NuGet package and directory in 'src')
-let project = "S3Provider"
+let project = "Amazon.CloudWatch.Selector"
 
 // Short summary of the project
 // (used as description in AssemblyInfo and as a short summary for NuGet package)
-let summary = "F# type provider for Amazon S3"
+let summary = "Extension library for AWSSDK that allows you to select CloudWatch metrics with simple queries"
 
 // Longer description of the project
 // (used as a description for NuGet package; line breaks are automatically cleaned up)
 let description = """
-  This library is for the .Net platform implementating a type provider for Amazon S3."""
+"""
 // List of author names (for NuGet package)
 let authors = [ "Yan Cui" ]
 // Tags for your project (for NuGet package)
-let tags = "F# fsharp aws s3 amazon cloud"
+let tags = "F# fsharp aws amazon cloudwatch dsl"
 
 // File system information 
 // (<solutionFile>.sln is built during the building process)
-let solutionFile  = "S3Provider"
+let projectFile  = "CloudWatch.Selector.fsproj"
 // Pattern specifying assemblies to be tested using NUnit
-let testAssemblies = ["tests/*/bin/*/S3Provider*Tests*.dll"]
+let testAssemblies = ["tests/*/bin/*/CloudWatch.Selector*Tests*.dll"]
 
 // Git configuration (used for publishing documentation in gh-pages branch)
 // The profile where the project is posted 
 let gitHome = "https://github.com/theburningmonk"
 // The name of the project on GitHub
-let gitName = "S3Provider"
+let gitName = "Amazon.CloudWatch.Selector"
 
 // --------------------------------------------------------------------------------------
 // END TODO: The rest of the file includes standard build steps 
@@ -60,11 +64,11 @@ let release = parseReleaseNotes (IO.File.ReadAllLines "RELEASE_NOTES.md")
 Target "AssemblyInfo" (fun _ ->
   let fileName = "src/" + project + "/AssemblyInfo.fs"
   CreateFSharpAssemblyInfo fileName
-      [ Attribute.Title project
-        Attribute.Product project
-        Attribute.Description summary
-        Attribute.Version release.AssemblyVersion
-        Attribute.FileVersion release.AssemblyVersion ] 
+      [ Attribute.Title         project
+        Attribute.Product       project
+        Attribute.Description   summary
+        Attribute.Version       release.AssemblyVersion
+        Attribute.FileVersion   release.AssemblyVersion ] 
 )
 
 // --------------------------------------------------------------------------------------
@@ -73,22 +77,24 @@ Target "AssemblyInfo" (fun _ ->
 Target "RestorePackages" RestorePackages
 
 Target "Clean" (fun _ ->
-    CleanDirs ["bin"; "temp"]
+    CleanDirs [ buildDir; testDir; tempDir ]
 )
 
 Target "CleanDocs" (fun _ ->
-    CleanDirs ["docs/output"]
+    CleanDirs [ "docs/output" ]
 )
 
 // --------------------------------------------------------------------------------------
 // Build library & test project
 
+let files includes = 
+  { BaseDirectory = __SOURCE_DIRECTORY__
+    Includes = includes
+    Excludes = [] } 
+
 Target "Build" (fun _ ->
-    { BaseDirectory = __SOURCE_DIRECTORY__
-      Includes = [ solutionFile +       ".sln"
-                   solutionFile + ".Tests.sln" ]
-      Excludes = [] } 
-    |> MSBuildRelease "" "Rebuild"
+    files [ "src/CloudWatch.Selector/" + projectFile ]
+    |> MSBuildRelease buildDir "Rebuild"
     |> ignore
 )
 
@@ -130,10 +136,11 @@ Target "NuGet" (fun _ ->
             Version = release.NugetVersion
             ReleaseNotes = String.Join(Environment.NewLine, release.Notes)
             Tags = tags
-            OutputPath = "bin"
+            OutputPath = "nuget"
             AccessKey = getBuildParamOrDefault "nugetkey" ""
             Publish = hasBuildParam "nugetkey"
-            Dependencies = [] })
+            Dependencies = 
+                [ "AWSSDK",  GetPackageVersion "packages" "AWSSDK" ] })
         ("nuget/" + project + ".nuspec")
 )
 
@@ -171,11 +178,11 @@ Target "All" DoNothing
   ==> "RestorePackages"
   ==> "AssemblyInfo"
   ==> "Build"
-  ==> "RunTests"
+//  ==> "RunTests"
   ==> "All"
 
 "All" 
-  ==> "CleanDocs"
+//  ==> "CleanDocs"
 //  ==> "GenerateDocs"
 //  ==> "ReleaseDocs"
   ==> "NuGet"

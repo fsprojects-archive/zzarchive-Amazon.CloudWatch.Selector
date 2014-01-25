@@ -5,9 +5,9 @@
     <version>@build.number@</version>
     <authors>@authors@</authors>
     <owners>@authors@</owners>
-    <licenseUrl>http://github.com/theburningmonk/S3Provider/blob/master/LICENSE.txt</licenseUrl>
-    <projectUrl>http://github.com/theburningmonk/S3Provider</projectUrl>
-    <iconUrl>https://raw.github.com/theburningmonk/S3Provider/master/nuget/logo.png</iconUrl>
+    <licenseUrl>https://github.com/theburningmonk/Amazon.CloudWatch.Selector/blob/develop/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/theburningmonk/Amazon.CloudWatch.Selector</projectUrl>
+    <iconUrl>https://raw.github.com/theburningmonk/Amazon.CloudWatch.Selector/develop/nuget/logo.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>@summary@</summary>
     <description>@description@</description>
@@ -17,6 +17,6 @@
     @dependencies@
   </metadata>
   <files>
-    <file src="..\bin\S3Provider.dll" target="lib/net40" />
+    <file src="..\build\Amazon.CloudWatch.Selector.dll" target="lib/net45" />
   </files>
 </package>
