@@ -140,6 +140,13 @@ module Execution =
             | x    -> x
         | _ -> None
 
+    let getPeriod = function
+        | Some (Period ts) -> 
+            // NOTE : period must be at least 60 and a multiple of 60 
+            // see http://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricStatistics.html
+            Some <| (ceil ts.TotalMinutes) * 60.0
+        | _ -> None
+
     let getDatapointPred filter =
         let rec loop (acc : (Datapoint -> bool) option) = function
             | StatsFilter (term, pred) ->
@@ -174,7 +181,9 @@ module Execution =
 
         loop [] null
 
-    let getMetricStats (cloudWatch : IAmazonCloudWatch) (metric : Metric) filter timeframe =
+    let getMetricStats (cloudWatch : IAmazonCloudWatch) 
+                       (metric : Metric) 
+                       { Filter = filter; TimeFrame = timeframe; Period = period } =
         let pred = getDatapointPred filter
 
         async {
@@ -188,7 +197,10 @@ module Execution =
                 | Between(a, b) -> a, b
             req.StartTime <- startTime
             req.EndTime   <- endTime
-            req.Period    <- 60
+
+            match getPeriod period with
+            | Some seconds -> req.Period <- int seconds
+            | _ -> ()
             
             req.Statistics <- statistics
 
@@ -203,7 +215,7 @@ module Execution =
             else return None
         }
 
-    let select (cloudWatch : IAmazonCloudWatch) ({ Filter = filter; TimeFrame = timeframe }) = 
+    let select (cloudWatch : IAmazonCloudWatch) ({ Filter = filter } as query) = 
         let metricPred = getMetricPred filter
 
         async {
@@ -212,7 +224,7 @@ module Execution =
 
             let! results = 
                 metrics 
-                |> Array.map (fun m -> getMetricStats cloudWatch m filter timeframe) 
+                |> Array.map (fun m -> getMetricStats cloudWatch m query) 
                 |> Async.Parallel
                 
             return results |> Array.choose id
