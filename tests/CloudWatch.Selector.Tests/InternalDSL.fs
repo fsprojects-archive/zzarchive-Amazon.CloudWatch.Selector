@@ -157,3 +157,23 @@ type ``Given an internal DSL expression`` () =
 
         match timeframe with 
         | Last ts -> ts |> should equal <| TimeSpan.FromMinutes 3.0
+
+    [<Test>]
+    member test.``intervalOf should set the period of a query`` () =
+        let { Filter = filter; TimeFrame = timeframe; Period = period } = 
+            namespaceIs "namespace" @ last 3 minutes |> intervalOf 1 minutes
+
+        match filter with | MetricFilter(Namespace, _) -> true
+        |> should equal true
+
+        match timeframe with | Last _ -> true
+        |> should equal true
+
+        match timeframe with 
+        | Last ts -> ts |> should equal <| TimeSpan.FromMinutes 3.0
+
+        match period with | Some ts -> true
+        |> should equal true
+
+        match period with 
+        | Some (Period ts) -> ts |> should equal <| TimeSpan.FromMinutes 1.0

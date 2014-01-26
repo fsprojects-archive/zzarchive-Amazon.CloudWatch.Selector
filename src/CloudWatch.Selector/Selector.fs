@@ -30,8 +30,8 @@ module Model =
         | Sum
         | SampleCount
 
-    type Unit = 
-        | Unit
+    type Unit      = | Unit
+    type Dimension = | Dimension
 
     type TimeFrame =
         | Last              of TimeSpan
@@ -42,17 +42,21 @@ module Model =
         | MetricFilter      of MetricTerm * (string -> bool)
         | StatsFilter       of StatsTerm * (float -> bool)
         | UnitFilter        of Unit * (string -> bool)
+        | DimensionFilter   of Dimension * (string * string)
         | CompositeFilter   of Filter * Filter
 
-        static member (+) (lf : Filter, rt : Filter)    = CompositeFilter (lf, rt)        
+        static member (+) (lf : Filter, rt : Filter) = CompositeFilter (lf, rt)
 
-    and Query =
+    type Period = | Period  of TimeSpan
+
+    type Query =
         {
             Filter      : Filter
             TimeFrame   : TimeFrame
+            Period      : Period option
         }
 
-    let (@) (lf : Filter) (rt : TimeFrame) = { Filter = lf; TimeFrame = rt }
+    let (@) filter timeframe       = { Filter = filter; TimeFrame = timeframe; Period = None }
 
     let statistics = new List<string>([| "Average"; "Sum"; "SampleCount"; "Maximum"; "Minimum" |])
     let units      = Set [ "Seconds"; "Microseconds"; "Milliseconds"; 
@@ -94,6 +98,8 @@ module InternalDSL =
     let inline last n (unit : 'a -> TimeSpan) = unit n |> Last
     let since timestamp = Since timestamp
     let between startTime endTime = Between(startTime, endTime)
+
+    let inline intervalOf n (unit : 'a -> TimeSpan) query = { query with Period = Some (unit n |> Period) }
 
     // TODO : handle dimensions
 

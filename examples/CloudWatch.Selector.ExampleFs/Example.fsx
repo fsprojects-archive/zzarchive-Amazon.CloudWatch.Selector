@@ -11,7 +11,6 @@ let region     = RegionEndpoint.USEast1
 let cloudWatch = AWSClientFactory.CreateAmazonCloudWatchClient(awsKey, awsSecret, region)
 
 // using the internal DSL
-let res = cloudWatch.Select(namespaceLike "iwi" + nameLike "total" @ last 24 hours)
-
-let res = res |> Async.RunSynchronously
+let res = cloudWatch.Select(namespaceLike "iwi" + nameLike "total" @ last 24 hours) 
+          |> Async.RunSynchronously
 
