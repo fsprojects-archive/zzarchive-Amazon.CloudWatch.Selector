@@ -14,3 +14,6 @@ let cloudWatch = AWSClientFactory.CreateAmazonCloudWatchClient(awsKey, awsSecret
 let res = cloudWatch.Select(namespaceLike "iwi" + nameLike "total" + sampleCount (>) 50.0 @ last 24 hours |> intervalOf 5 minutes) 
           |> Async.RunSynchronously
 
+// using the internal DSL
+let res' = cloudWatch.Select(namespaceLike "elasticache" + nameLike "cpu" + dimensionContains ("CacheNodeId", "0001") + max (>) 30.0 @ last 24 hours |> intervalOf 15 minutes)
+          |> Async.RunSynchronously

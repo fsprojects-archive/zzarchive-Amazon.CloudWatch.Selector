@@ -82,6 +82,13 @@ type ``Given an internal DSL expression`` () =
     member test.``sampleCount should create a predicate for numeric comparison`` () = testStatsFilter sampleCount SampleCount
 
     [<Test>]
+    member test.``dimensionContains should create a dimension filter`` () =
+        let (DimensionFilter(term, dim)) = dimensionContains ("name", "value")
+
+        term |> should equal Dimension
+        dim  |> should equal ("name", "value")
+
+    [<Test>]
     member test.``last should create a timeframe for last x minutes`` () =
         let (Last ts) = last 5 minutes
         ts |> should equal <| TimeSpan.FromMinutes 5.0

@@ -11,10 +11,8 @@ open Amazon.CloudWatch.Model
 
 (*
     External DSL example:
-        "namespaceLike 'count%' and unitIs 'milliseconds' and maxGreaterThan 10000 duringLast 10 minutes"
+        "namespaceLike 'count%' and unitIs 'milliseconds' and max >= 10000 duringLast 10 minutes"
 
-    internal DSL example:
-        (fun m -> m.namespace like "count%" and m.unit = "milliseconds" and m.max >= 10000 during(10<min>))
 *)
 
 [<AutoOpen>]
@@ -78,30 +76,29 @@ module InternalDSL =
     let namespaceIs ns        = eqFilter MetricFilter Namespace ns
     let namespaceLike pattern = regexFilter MetricFilter Namespace pattern
 
-    let nameIs name       = eqFilter MetricFilter Name name
-    let nameLike pattern  = regexFilter MetricFilter Name pattern
+    let nameIs name           = eqFilter MetricFilter Name name
+    let nameLike pattern      = regexFilter MetricFilter Name pattern
 
-    let unitIs unit       = eqFilter UnitFilter Unit unit
+    let unitIs unit           = eqFilter UnitFilter Unit unit
 
     let inline private statsFilter term op value = StatsFilter <| (term, fun x -> op x value)
+    let average op value      = statsFilter Average op value
+    let min op value          = statsFilter Min op value
+    let max op value          = statsFilter Max op value
+    let sum op value          = statsFilter Sum op value
+    let sampleCount op value  = statsFilter SampleCount op value
 
-    let average op value     = statsFilter Average op value
-    let min op value         = statsFilter Min op value
-    let max op value         = statsFilter Max op value
-    let sum op value         = statsFilter Sum op value
-    let sampleCount op value = statsFilter SampleCount op value
+    let dimensionContains dim = DimensionFilter(Dimension, dim)
 
-    let inline minutes n = n |> float |> TimeSpan.FromMinutes
-    let inline hours n   = n |> float |> TimeSpan.FromHours
-    let inline days n    = n |> float |> TimeSpan.FromDays
+    let inline minutes n      = n |> float |> TimeSpan.FromMinutes
+    let inline hours n        = n |> float |> TimeSpan.FromHours
+    let inline days n         = n |> float |> TimeSpan.FromDays
 
     let inline last n (unit : 'a -> TimeSpan) = unit n |> Last
-    let since timestamp = Since timestamp
+    let since timestamp           = Since timestamp
     let between startTime endTime = Between(startTime, endTime)
 
     let inline intervalOf n (unit : 'a -> TimeSpan) query = { query with Period = Some (unit n |> Period) }
-
-    // TODO : handle dimensions
 
 [<AutoOpen>]
 module ExternalDSL =
@@ -109,6 +106,8 @@ module ExternalDSL =
 
 [<AutoOpen>]
 module Execution = 
+    type AwsDimension = Amazon.CloudWatch.Model.Dimension
+
     let inline (<&&>) g f x = g x && f x
     let inline (<?&>) g f = match g with | Some g -> g <&&> f | _ -> f
     let inline (<&?>) g f = match f with | Some f -> g <&&> f | _ -> g
@@ -116,7 +115,8 @@ module Execution =
     let alwaysTrue = fun _ -> true
 
     let getMetricPred filter = 
-        let rec loop (acc : (Metric -> bool) option) = function
+        let rec loop filter (acc : (Metric -> bool) option) =
+            match filter with
             | MetricFilter (term, pred) -> 
                 match term with 
                 | Namespace -> fun (m : Metric) -> pred m.Namespace
@@ -125,14 +125,24 @@ module Execution =
                 |> Some
             | CompositeFilter (lf, rt) ->
                 // depth-first
-                let acc = loop acc lf
-                loop acc rt
+                acc |> loop lf |> loop rt
             | _ -> acc
         
-        loop None filter <?&> alwaysTrue
+        loop filter None <?&> alwaysTrue
+
+    let getDimensions filter = 
+        let rec loop filter acc =
+            match filter with
+            | DimensionFilter (Dimension, dim) -> dim::acc
+            | CompositeFilter (lf, rt) ->
+                // depth-first
+                acc |> loop lf |> loop rt
+            | _ -> acc
+
+        loop filter []
 
     let rec getUnit = function
-        | UnitFilter (_, pred) -> units |> Seq.tryFind pred
+        | UnitFilter (Unit, pred) -> units |> Seq.tryFind pred
         | CompositeFilter (lf, rt) ->
             // depth-first
             match getUnit lf with
@@ -148,7 +158,8 @@ module Execution =
         | _ -> None
 
     let getDatapointPred filter =
-        let rec loop (acc : (Datapoint -> bool) option) = function
+        let rec loop filter (acc : (Datapoint -> bool) option) = 
+            match filter with
             | StatsFilter (term, pred) ->
                 match term with
                 | Average     -> fun (dp : Datapoint) -> pred dp.Average
@@ -160,23 +171,25 @@ module Execution =
                 |> Some
             | CompositeFilter (lf, rt) ->
                 // depth-first
-                let acc = loop acc lf
-                loop acc rt
+                acc |> loop lf |> loop rt
             | _ -> acc
 
-        loop None filter <?&> alwaysTrue
+        loop filter None <?&> alwaysTrue
 
-    let getMetrics (cloudWatch : IAmazonCloudWatch) =
+    let getMetrics (cloudWatch : IAmazonCloudWatch) filter =
+        let dims = getDimensions filter |> Seq.map (fun (name, value) -> new DimensionFilter(Name = name, Value = value))
+
         let rec loop (acc : _ list) next = 
             async {
                 let req  = new ListMetricsRequest()
                 req.NextToken <- next
+                req.Dimensions.AddRange dims
 
                 let! res = cloudWatch.ListMetricsAsync(req) |> Async.AwaitTask
 
                 match res.NextToken with
-                | null  -> return (res.Metrics :: acc) |> Seq.collect id
-                | token -> return! loop (res.Metrics :: acc) token
+                | null  -> return (res.Metrics::acc) |> Seq.collect id
+                | token -> return! loop (res.Metrics::acc) token
             }
 
         loop [] null
@@ -203,6 +216,7 @@ module Execution =
             | _ -> ()
             
             req.Statistics <- statistics
+            req.Dimensions <- metric.Dimensions
 
             match getUnit filter with
             | Some unit -> req.Unit <- new StandardUnit(unit)
@@ -219,7 +233,7 @@ module Execution =
         let metricPred = getMetricPred filter
 
         async {
-            let! metrics = getMetrics cloudWatch
+            let! metrics = getMetrics cloudWatch filter
             let metrics  = metrics |> Seq.filter metricPred |> Seq.toArray
 
             let! results = 
