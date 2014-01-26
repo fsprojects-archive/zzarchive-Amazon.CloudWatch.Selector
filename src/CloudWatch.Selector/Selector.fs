@@ -1,4 +1,4 @@
-﻿module Amazon.CloudWatch.Selector
+﻿namespace Amazon.CloudWatch.Selector
 
 open System
 open System.Collections.Generic
@@ -12,7 +12,6 @@ open Amazon.CloudWatch.Model
 (*
     External DSL example:
         "namespaceLike 'count%' and unitIs 'milliseconds' and max >= 10000 duringLast 10 minutes"
-
 *)
 
 [<AutoOpen>]
