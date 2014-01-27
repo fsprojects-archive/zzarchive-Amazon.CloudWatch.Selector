@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CloudWatch.Selector", "CloudWatch.Selector.fsproj", "{8C01510D-2594-433F-BA15-FD5D89082FC3}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CloudWatch.Selector", "src\CloudWatch.Selector\CloudWatch.Selector.fsproj", "{8C01510D-2594-433F-BA15-FD5D89082FC3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{89EFE370-AAF6-4767-90A3-8D3EDC1B1CA6}"
 	ProjectSection(SolutionItems) = preProject
@@ -12,19 +12,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{89EFE3
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "project", "project", "{75D63101-ADBF-499B-BDB8-E49162E65798}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\nuget\Amazon.CloudWatch.Selector.nuspec = ..\..\nuget\Amazon.CloudWatch.Selector.nuspec
-		..\..\build.fsx = ..\..\build.fsx
-		..\..\README.md = ..\..\README.md
-		..\..\RELEASE_NOTES.md = ..\..\RELEASE_NOTES.md
+		nuget\Amazon.CloudWatch.Selector.nuspec = nuget\Amazon.CloudWatch.Selector.nuspec
+		build.fsx = build.fsx
+		README.md = README.md
+		RELEASE_NOTES.md = RELEASE_NOTES.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{28407BD8-01B8-495A-BF27-9E760441C921}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CloudWatch.Selector.Tests", "..\..\tests\CloudWatch.Selector.Tests\CloudWatch.Selector.Tests.fsproj", "{5369CEAF-60ED-4C51-8C36-20E5332AC351}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CloudWatch.Selector.Tests", "tests\CloudWatch.Selector.Tests\CloudWatch.Selector.Tests.fsproj", "{5369CEAF-60ED-4C51-8C36-20E5332AC351}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{818E9626-8FDC-40CD-ACC7-CFC580A82F8E}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CloudWatch.Selector.ExampleFs", "..\..\examples\CloudWatch.Selector.ExampleFs\CloudWatch.Selector.ExampleFs.fsproj", "{57AD9538-45B0-49F3-9462-F74C3C4F54AA}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CloudWatch.Selector.ExampleFs", "examples\CloudWatch.Selector.ExampleFs\CloudWatch.Selector.ExampleFs.fsproj", "{57AD9538-45B0-49F3-9462-F74C3C4F54AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
