@@ -56,8 +56,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CloudWatch.Selector\CloudWatch.Selector.fsproj">
-      <Name>CloudWatch.Selector</Name>
+    <ProjectReference Include="..\..\src\CloudWatch.Selector\Amazon.CloudWatch.Selector.fsproj">
+      <Name>Amazon.CloudWatch.Selector</Name>
       <Project>{8c01510d-2594-433f-ba15-fd5d89082fc3}</Project>
       <Private>True</Private>
     </ProjectReference>

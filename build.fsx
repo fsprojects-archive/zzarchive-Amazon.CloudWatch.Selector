@@ -25,7 +25,7 @@ let tempDir  = "temp/"
 
 // The name of the project 
 // (used by attributes in AssemblyInfo, name of a NuGet package and directory in 'src')
-let project = "CloudWatch.Selector"
+let project = "Amazon.CloudWatch.Selector"
 
 // Short summary of the project
 // (used as description in AssemblyInfo and as a short summary for NuGet package)
@@ -34,6 +34,8 @@ let summary = "Extension library for AWSSDK that allows you to select CloudWatch
 // Longer description of the project
 // (used as a description for NuGet package; line breaks are automatically cleaned up)
 let description = """
+This library adds easy-to-use internal and external DSLs for querying against Amazon CloudWatch metrics to make
+finding correlations in the metrics stats much easier.
 """
 // List of author names (for NuGet package)
 let authors = [ "Yan Cui" ]
@@ -42,7 +44,7 @@ let tags = "F# fsharp aws amazon cloudwatch dsl"
 
 // File system information 
 // (<solutionFile>.sln is built during the building process)
-let projectFile  = "CloudWatch.Selector.fsproj"
+let projectFile  = "Amazon.CloudWatch.Selector.fsproj"
 // Pattern specifying assemblies to be tested using NUnit
 let testAssemblies = ["tests/*/bin/*/CloudWatch.Selector*Tests*.dll"]
 
@@ -69,7 +71,7 @@ Target "AssemblyInfo" (fun _ ->
         Attribute.Description   summary
         Attribute.Version       release.AssemblyVersion
         Attribute.FileVersion   release.AssemblyVersion
-        Attribute.InternalsVisibleTo "CloudWatch.Selector.Tests" ] 
+        Attribute.InternalsVisibleTo "Amazon.CloudWatch.Selector.Tests" ] 
 )
 
 // --------------------------------------------------------------------------------------
