@@ -1,10 +1,9 @@
 ﻿namespace System
-
 open System.Reflection
 open System.Runtime.CompilerServices
 
-[<assembly: AssemblyTitleAttribute("Amazon.CloudWatch.Selector")>]
-[<assembly: AssemblyProductAttribute("Amazon.CloudWatch.Selector")>]
+[<assembly: AssemblyTitleAttribute("CloudWatch.Selector")>]
+[<assembly: AssemblyProductAttribute("CloudWatch.Selector")>]
 [<assembly: AssemblyDescriptionAttribute("Extension library for AWSSDK that allows you to select CloudWatch metrics with simple queries")>]
 [<assembly: AssemblyVersionAttribute("0.1.0")>]
 [<assembly: AssemblyFileVersionAttribute("0.1.0")>]
