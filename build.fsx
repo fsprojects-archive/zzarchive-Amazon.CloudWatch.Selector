@@ -44,9 +44,10 @@ let tags = "F# fsharp aws amazon cloudwatch dsl"
 
 // File system information 
 // (<solutionFile>.sln is built during the building process)
-let projectFile  = "Amazon.CloudWatch.Selector.fsproj"
+let projectFile     = "Amazon.CloudWatch.Selector.fsproj"
+let testProjectFile = "Amazon.CloudWatch.Selector.Tests.fsproj"
 // Pattern specifying assemblies to be tested using NUnit
-let testAssemblies = ["tests/*/bin/*/CloudWatch.Selector*Tests*.dll"]
+let testAssemblies = ["tests/*/bin/*/Amazon.CloudWatch.Selector*Tests*.dll"]
 
 // Git configuration (used for publishing documentation in gh-pages branch)
 // The profile where the project is posted 
@@ -96,7 +97,8 @@ let files includes =
     Excludes = [] } 
 
 Target "Build" (fun _ ->
-    files [ "src/CloudWatch.Selector/" + projectFile ]
+    files [ "src/CloudWatch.Selector/" + projectFile
+            "tests/CloudWatch.Selector.Tests/" + testProjectFile ]
     |> MSBuildRelease buildDir "Rebuild"
     |> ignore
 )
@@ -181,7 +183,7 @@ Target "All" DoNothing
   ==> "RestorePackages"
   ==> "AssemblyInfo"
   ==> "Build"
-//  ==> "RunTests"
+  ==> "RunTests"
   ==> "All"
 
 "All" 
