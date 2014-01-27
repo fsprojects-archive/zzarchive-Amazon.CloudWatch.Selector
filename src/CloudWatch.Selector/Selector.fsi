@@ -93,11 +93,15 @@ module ExternalDSL =
 [<AutoOpen>]
 module Execution = 
     type IAmazonCloudWatch with
-        member Select : Query -> Async<(Metric * List<Datapoint>)[]>
+        member Select : Query  -> Async<(Metric * List<Datapoint>)[]>
+        member Select : string -> Async<(Metric * List<Datapoint>)[]>
 
     [<Extension>]
     [<AbstractClass>]
     [<Sealed>]
     type AmazonCloudWatchContextExt =
         [<Extension>]
-        static member Select : IAmazonCloudWatch * Query -> Task<(Metric * List<Datapoint>) []>
+        static member Select : IAmazonCloudWatch * Query  -> Task<(Metric * List<Datapoint>) []>
+
+        [<Extension>]
+        static member Select : IAmazonCloudWatch * string -> Task<(Metric * List<Datapoint>) []>
