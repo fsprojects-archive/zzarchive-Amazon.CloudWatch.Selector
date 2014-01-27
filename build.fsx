@@ -34,8 +34,8 @@ let summary = "Extension library for AWSSDK that allows you to select CloudWatch
 // Longer description of the project
 // (used as a description for NuGet package; line breaks are automatically cleaned up)
 let description = """
-This library adds easy-to-use internal and external DSLs for querying against Amazon CloudWatch metrics to make
-finding correlations in the metrics stats much easier.
+This library adds easy-to-use internal and external DSLs for querying against Amazon CloudWatch 
+metrics to make finding correlations in the metrics stats much easier.
 """
 // List of author names (for NuGet package)
 let authors = [ "Yan Cui" ]
@@ -64,7 +64,7 @@ let release = parseReleaseNotes (IO.File.ReadAllLines "RELEASE_NOTES.md")
 
 // Generate assembly info files with the right version & up-to-date information
 Target "AssemblyInfo" (fun _ ->
-  let fileName = "src/" + project + "/AssemblyInfo.fs"
+  let fileName = "src/CloudWatch.Selector/AssemblyInfo.fs"
   CreateFSharpAssemblyInfo fileName
       [ Attribute.Title         project
         Attribute.Product       project

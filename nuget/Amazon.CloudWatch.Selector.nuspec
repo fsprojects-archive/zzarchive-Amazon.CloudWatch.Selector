@@ -18,5 +18,7 @@
   </metadata>
   <files>
     <file src="..\build\Amazon.CloudWatch.Selector.dll" target="lib/net45" />
+    <file src="..\build\Amazon.CloudWatch.Selector.pdb" target="lib/net45" />
+    <file src="..\build\Amazon.CloudWatch.Selector.xml" target="lib/net45" />
   </files>
 </package>
