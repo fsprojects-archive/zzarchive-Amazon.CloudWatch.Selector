@@ -105,9 +105,9 @@ module InternalDSL =
 
 [<AutoOpen>]
 module ExternalDSL =
-    let inline minutes n  = n |> float |> TimeSpan.FromMinutes
-    let inline hours n    = n |> float |> TimeSpan.FromHours
-    let inline days n     = n |> float |> TimeSpan.FromDays
+    let inline minutes n  = n |> TimeSpan.FromMinutes
+    let inline hours n    = n |> TimeSpan.FromHours
+    let inline days n     = n |> TimeSpan.FromDays
     let timestampFormat   = "yyyy-MM-dd HH:mm:ss"
 
     let (|StringCI|_|) (str : string) input = 
@@ -123,6 +123,7 @@ module ExternalDSL =
         | EmptyString -> None
         | str when str.Length < 2 -> None
         | StartsWith ''' & EndsWith ''' -> Some <| input.Substring(1, input.Length - 2)
+        | _ -> None
 
     let (|Float|) input = 
         match System.Double.TryParse input with
@@ -138,7 +139,7 @@ module ExternalDSL =
         | "<"  -> (<)
         | x    -> failwithf "Unexpected token [%s], expecting =, >=, >, <= or <." x
 
-    let inline (|Minutes|Hours|Days|) input = 
+    let (|Minutes|Hours|Days|) input = 
         match input with
         | StringCI "Minutes" -> Minutes minutes
         | StringCI "Hours"   -> Hours hours
@@ -185,6 +186,11 @@ module ExternalDSL =
             -> Some(eqFilter UnitFilter Unit unit, tl)
         | _ -> None
 
+    let (|DimensionContains|_|) = function
+        | StringCI "DimensionContains"::QuotedString name::QuotedString value::tl
+            -> Some(DimensionFilter(Dimension, (name, value)), tl)
+        | _ -> None
+
     let (|Average|_|) = function
         | StringCI "Average"::Operator op::Float value::tl -> Some(statsFilter StatsTerm.Average op value, tl)
         | _ -> None
@@ -206,7 +212,7 @@ module ExternalDSL =
         | _ -> None
 
     let (|DuringLast|_|) = function
-        | StringCI "DuringLast"::Float n::(Minutes unit|Hours unit|Days unit)::tl 
+        | StringCI "DuringLast"::Float n::(Minutes unit | Hours unit | Days unit)::tl
             -> Some(unit n |> Last, tl)
         | _ -> None
 
@@ -220,9 +226,41 @@ module ExternalDSL =
         | _ -> None
 
     let (|IntervalOf|_|) = function
-        | StringCI "IntervalOf"::Float n::(Minutes unit|Hours unit|Days unit)::tl
+        | StringCI "IntervalOf"::Float n::(Minutes unit | Hours unit | Days unit)::tl
             -> Some(unit n |> Period, tl)
         | _ -> None
+
+    let tokenize (str : string) = 
+        let tokens = new List<string>()        
+        let buffer = new List<char>()
+        let enumerator = str.TrimStart(' ').GetEnumerator()
+        let mutable isInQuotes = false
+        let flushBuffer () = 
+            new String(buffer.ToArray()) |> tokens.Add
+            buffer.Clear()
+
+        while enumerator.MoveNext() do
+            match enumerator.Current, isInQuotes, buffer.Count with
+            // spaces in between single quotes should be included
+            | ' ', true, _  -> buffer.Add enumerator.Current
+            // e.g. "mary   had a" ignore the adjacent spaces between "mary" and "had"
+            | ' ', false, 0 -> ()
+            // otherwise this is the end of a token
+            | ' ', false, _ -> flushBuffer()
+            // ' appearing at the start of a token, e.g. "date is '2014-01-14'"
+            | ''', false, 0 -> 
+                buffer.Add enumerator.Current
+                isInQuotes <- true
+            // ' appearing at the end of a token
+            | ''', true, _ ->
+                buffer.Add enumerator.Current
+                isInQuotes <- false
+                flushBuffer()                
+            | x, _, _ -> buffer.Add enumerator.Current
+
+        if buffer.Count > 0 then flushBuffer()
+        
+        tokens |> List.ofSeq
 
     let parseFilter tokens = 
         let rec loop acc = function
@@ -232,9 +270,10 @@ module ExternalDSL =
             | Average       (filter, tl) | Sum           (filter, tl)
             | Min           (filter, tl) | Max           (filter, tl)
             | SampleCount   (filter, tl)
+            | DimensionContains (filter, tl)
                 -> match tl with
                    | And tl -> loop (filter::acc) tl
-                   | _ -> (filter::acc) |> List.reduce (+), tl
+                   | _ -> (filter::acc) |> List.rev |> List.reduce (+), tl
             | _ -> failwith "Missing filters. You need to specify at least one filter on the metric or stats."
 
         loop [] tokens
@@ -256,7 +295,8 @@ module ExternalDSL =
         | _ -> query
 
     let parse (input : string) =
-        input.Split(' ') |> List.ofArray
+        input
+        |> tokenize
         |> parseFilter
         |> parseTimeFrame
         |> parsePeriod
@@ -404,7 +444,7 @@ module Execution =
     /// F#-friendly extension methods
     type IAmazonCloudWatch with
         member this.Select(query : Query)  = select this query
-        member this.Select(query : string) = ()
+        member this.Select(query : string) = select this <| parse query
 
     /// C#-friendely extension methods
     [<Extension>]
@@ -415,4 +455,4 @@ module Execution =
         static member Select (cloudWatch : IAmazonCloudWatch, query : Query) = cloudWatch.Select query |> Async.StartAsTask
 
         [<Extension>]
-        static member Select (cloudWatch : IAmazonCloudWatch, query : string) = ()
+        static member Select (cloudWatch : IAmazonCloudWatch, query : string) = cloudWatch.Select query |> Async.StartAsTask

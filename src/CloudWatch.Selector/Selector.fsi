@@ -79,6 +79,18 @@ module InternalDSL =
     val inline intervalOf : n:'a -> unit:('a -> TimeSpan) -> query:Query -> Query
 
 [<AutoOpen>]
+module ExternalDSL =
+    val internal tokenize       : query:string -> string list
+
+    val internal parseFilter    : tokens:string list -> Filter * string list
+
+    val internal parseTimeFrame : filter:Filter * tokens:string list -> Query * string list
+
+    val internal parsePeriod    : query:Query * tokens:string list -> Query
+
+    val internal parse          : query:string -> Query
+
+[<AutoOpen>]
 module Execution = 
     type IAmazonCloudWatch with
         member Select : Query -> Async<(Metric * List<Datapoint>)[]>

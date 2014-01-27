@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InternalDSL.fs" />
+    <Compile Include="ExternalDSL.fs" />
     <None Include="packages.config" />
     <None Include="app.config" />
   </ItemGroup>
