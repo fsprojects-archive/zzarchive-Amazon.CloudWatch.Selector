@@ -1,33 +1,48 @@
 ﻿open System
+open System.Collections.Generic
 open Microsoft.FSharp.Text
+
+open FSharp.Charting
+open FSharp.Charting.ChartTypes
 
 open Amazon
 open Amazon.CloudWatch
+open Amazon.CloudWatch.Model
 open Amazon.CloudWatch.Selector
 
-let (|Exit|_|) (input : string) =
-    if input.Equals("exit", StringComparison.CurrentCultureIgnoreCase) then Some () else None
+let stringCI text (input : string) = input.Equals(text, StringComparison.CurrentCultureIgnoreCase)
+
+let (|Exit|_|) input = if stringCI "exit" input then Some () else None
+let (|Plot|_|) input = if stringCI "plot" input then Some () else None
 
 let csv (seq : string seq) = String.Join(", ", seq)
 
-let rec loop (cloudWatch : IAmazonCloudWatch) = 
+let rec loop (cloudWatch : IAmazonCloudWatch) (state : (Metric * List<Datapoint>)[] option) = 
     let prefix = "\nselector> "
 
     printf "%s" prefix
     match Console.ReadLine() with
     | Exit  -> printfn "%sGood bye!" prefix
+    | Plot  -> 
+        match state with
+        | Some res -> 
+            printfn "%sPlotting..." prefix
+            loop cloudWatch state
+        | _ -> 
+            printfn "%sPlease run a query first" prefix
+            loop cloudWatch state   
     | query -> 
         printfn "%sRunning... (might take a minute)" prefix
-        let res = cloudWatch.Select query |> Async.RunSynchronously
+        let state = cloudWatch.Select query |> Async.RunSynchronously
 
-        printfn "%sFound %d metrics" prefix res.Length
-        for (metric, _) in res do
+        printfn "%sFound %d metrics" prefix state.Length
+        for (metric, _) in state do
             printfn "Namespace : %s | Name : %s | Dimensions : [ %s ]" 
                     metric.Namespace 
                     metric.MetricName 
                     (metric.Dimensions |> Seq.map (fun dim -> sprintf "%s:%s" dim.Name dim.Value) |> csv)
-
-        loop cloudWatch
+        
+        loop cloudWatch (Some state)
 
 [<EntryPoint>]
 let main argv = 
@@ -55,6 +70,6 @@ let main argv =
     let region = RegionEndpoint.USEast1
     let cloudWatch = AWSClientFactory.CreateAmazonCloudWatchClient(!awsKey, !awsSecret, region)
 
-    loop cloudWatch
+    loop cloudWatch None
 
     0 // return an integer exit code
