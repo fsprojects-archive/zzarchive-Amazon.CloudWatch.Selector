@@ -10,6 +10,7 @@ open Fake.ReleaseNotesHelper
 open System
 
 let buildDir = "build/"
+let cliDir   = "cli/"
 let testDir  = "test/"
 let tempDir  = "temp/"
 
@@ -46,6 +47,7 @@ let tags = "F# fsharp aws amazon cloudwatch dsl"
 // (<solutionFile>.sln is built during the building process)
 let projectFile     = "Amazon.CloudWatch.Selector.fsproj"
 let testProjectFile = "Amazon.CloudWatch.Selector.Tests.fsproj"
+let cliProjectFile  = "Amazon.CloudWatch.Selector.Cli.fsproj"
 // Pattern specifying assemblies to be tested using NUnit
 let testAssemblies = ["tests/*/bin/*/Amazon.CloudWatch.Selector*Tests*.dll"]
 
@@ -81,7 +83,7 @@ Target "AssemblyInfo" (fun _ ->
 Target "RestorePackages" RestorePackages
 
 Target "Clean" (fun _ ->
-    CleanDirs [ buildDir; testDir; tempDir ]
+    CleanDirs [ buildDir; cliDir; testDir; tempDir ]
 )
 
 Target "CleanDocs" (fun _ ->
@@ -175,6 +177,17 @@ Target "ReleaseDocs" (fun _ ->
 Target "Release" DoNothing
 
 // --------------------------------------------------------------------------------------
+// Build CLI
+
+Target "BuildCLI" (fun _ ->
+    files [ "src/CloudWatch.Selector.Cli/" + cliProjectFile ]
+    |> MSBuildRelease cliDir "Rebuild"
+    |> ignore
+)
+
+Target "CLI" DoNothing
+
+// --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 
 Target "All" DoNothing
@@ -192,5 +205,9 @@ Target "All" DoNothing
 //  ==> "ReleaseDocs"
   ==> "NuGet"
   ==> "Release"
+  
+"All"
+  ==> "BuildCLI"
+  ==> "CLI"
 
 RunTargetOrDefault "All"

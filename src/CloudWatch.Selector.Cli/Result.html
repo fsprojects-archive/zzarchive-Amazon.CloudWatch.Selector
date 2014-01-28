@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Amazon.CloudWatch.Selector result</title>
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript">
+            google.load("visualization", "1", {packages:["corechart"]});
+            google.setOnLoadCallback(drawChart);
+            function drawChart() {
+                var avgData = google.visualization.arrayToDataTable([
+                    @avg_data@
+                ]);
+                
+                var minData = google.visualization.arrayToDataTable([
+                    @min_data@
+                ]);
+                
+                var maxData = google.visualization.arrayToDataTable([
+                    @max_data@
+                ]);
+                
+                var sumData = google.visualization.arrayToDataTable([
+                    @sum_data@
+                ]);
+                
+                var sampleCountData = google.visualization.arrayToDataTable([
+                    @sample_count_data@
+                ]);
+
+                var avgChart = new google.visualization.LineChart(document.getElementById('avg_div'));
+                avgChart.draw(avgData, { title: 'Average' });
+
+                var minChart = new google.visualization.LineChart(document.getElementById('min_div'));
+                minChart.draw(minData, { title: 'Minimum' });
+
+                var maxChart = new google.visualization.LineChart(document.getElementById('max_div'));
+                maxChart.draw(maxData, { title: 'Maximum' });
+
+                var sumChart = new google.visualization.LineChart(document.getElementById('sum_div'));
+                sumChart.draw(sumData, { title: 'Sum' });
+
+                var sampleCountChart = new google.visualization.LineChart(document.getElementById('sampleCount_div'));
+                sampleCountChart.draw(sampleCountData, { title: 'Sample Count' });
+            }
+        </script>
+    </head>
+    
+    <body>
+        <div id="avg_div" style="width: 900px; height: 500px;"></div>
+        <div id="min_div" style="width: 900px; height: 500px;"></div>
+        <div id="max_div" style="width: 900px; height: 500px;"></div>
+        <div id="sum_div" style="width: 900px; height: 500px;"></div>
+        <div id="sampleCount_div" style="width: 900px; height: 500px;"></div>
+    </body>  
+</html>

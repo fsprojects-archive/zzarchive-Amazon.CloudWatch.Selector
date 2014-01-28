@@ -17,6 +17,7 @@ TestResults
 [Dd]ebug/
 [Rr]elease/
 build/
+cli/
 x64/
 *_i.c
 *_p.c
