@@ -136,5 +136,3 @@ Finally, to quit the CLI tool, type **exit** and hit return.
 
 Here's a quick demo video of the CLI tool in action.
 [![YouTube](https://raw.github.com/theburningmonk/Amazon.CloudWatch.Selector/develop/docs/files/img/youtube_demo_screenshot.png)](http://www.youtube.com/watch?v=XRtHfH26QQg)
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/theburningmonk/amazon.cloudwatch.selector/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
