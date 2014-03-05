@@ -26,7 +26,7 @@ let tempDir  = "temp/"
 
 // The name of the project 
 // (used by attributes in AssemblyInfo, name of a NuGet package and directory in 'src')
-let project = "Amazon.CloudWatch.Selector"
+let project    = "Amazon.CloudWatch.Selector"
 
 // Short summary of the project
 // (used as description in AssemblyInfo and as a short summary for NuGet package)
@@ -151,6 +151,28 @@ Target "NuGet" (fun _ ->
         ("nuget/" + project + ".nuspec")
 )
 
+Target "Chocolatey-CLI" (fun _ ->
+    // Format the description to fit on a single line (remove \r\n and double-spaces)
+    let description = description.Replace("\r", "")
+                                 .Replace("\n", "")
+                                 .Replace("  ", " ")
+
+    NuGet (fun p -> 
+        { p with   
+            Authors = authors
+            Project = project
+            Summary = summary
+            Description = description
+            Version = release.NugetVersion
+            ReleaseNotes = String.Join(Environment.NewLine, release.Notes)
+            Tags = tags
+            OutputPath = "chocolatey"
+            AccessKey = getBuildParamOrDefault "nugetkey" ""
+            Publish = hasBuildParam "nugetkey"
+            Dependencies = [] })
+        ("chocolatey/" + project + ".CLI.nuspec")
+)
+
 // --------------------------------------------------------------------------------------
 // Generate the documentation
 
@@ -196,6 +218,7 @@ Target "All" DoNothing
   ==> "RestorePackages"
   ==> "AssemblyInfo"
   ==> "Build"
+  ==> "BuildCLI"
   ==> "RunTests"
   ==> "All"
 
@@ -204,10 +227,11 @@ Target "All" DoNothing
 //  ==> "GenerateDocs"
 //  ==> "ReleaseDocs"
   ==> "NuGet"
+  ==> "Chocolatey-CLI"
   ==> "Release"
   
 "All"
-  ==> "BuildCLI"
+//  ==> "BuildCLI"
   ==> "CLI"
 
 RunTargetOrDefault "All"

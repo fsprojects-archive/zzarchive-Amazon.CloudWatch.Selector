@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{89EFE3
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "project", "project", "{75D63101-ADBF-499B-BDB8-E49162E65798}"
 	ProjectSection(SolutionItems) = preProject
+		chocolatey\Amazon.CloudWatch.Selector.CLI.nuspec = chocolatey\Amazon.CloudWatch.Selector.CLI.nuspec
 		nuget\Amazon.CloudWatch.Selector.nuspec = nuget\Amazon.CloudWatch.Selector.nuspec
 		build.fsx = build.fsx
 		README.md = README.md
