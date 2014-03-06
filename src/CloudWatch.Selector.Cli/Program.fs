@@ -119,6 +119,29 @@ All other inputs are treated as a query, go to http://bit.ly/awscwcli to learn m
         
         loop cloudWatch (Some state)
 
+let rec initClient (awsKey : string) (awsSecret : string) (region : RegionEndpoint) =
+    try
+        match awsKey, awsSecret with
+        | "", _ | null, _ -> invalidArg "awsKey" "Invalid AWS key"
+        | _, "" | _, null -> invalidArg "awsSecret" "Invalid AWS secret"
+        | _ -> AWSClientFactory.CreateAmazonCloudWatchClient(awsKey, awsSecret, region)
+    with
+    | _ -> 
+        let rec prompt () =
+            printfn """
+Please enter your AWS credentials in the form of ACCESS-KEY|ACCESS_SECRET, e.g.
+    AKIAITIDAJ88PL5FZ59Q|U4jBKoz6e2Znp1xTomYpzTB834XN4+sKxV1Aa47I
+
+"""
+            printf "Enter Credentials> "
+
+            match System.Console.ReadLine().Split('|') with
+            | [| awsKey; awsSecret |] when awsKey.Length = 20 && awsSecret.Length = 40
+              -> initClient awsKey awsSecret region
+            | _ -> printfn "Invalid AWS key and/or secret"
+                   prompt()
+        prompt()
+
 [<EntryPoint>]
 let main argv = 
     let compile s = ()
@@ -136,17 +159,21 @@ let main argv =
  
     ArgParser.Parse(specs, compile)
 
-    printfn "\n\n\n"
-    printfn "=============================================================="
-    printfn "======             Amazon.CloudWatch.Selector           ======"
-    printfn "=============================================================="
-    printfn "\nCloudWatch client initialized.\n"
+    printf """
 
-    let cloudWatch =
-        match !awsKey, !awsSecret, !region with
-        | "", "", _                 -> AWSClientFactory.CreateAmazonCloudWatchClient()
-        | awsKey, awsSecret, ""     -> AWSClientFactory.CreateAmazonCloudWatchClient(awsKey, awsSecret, RegionEndpoint.USEast1)
-        | awsKey, awsSecret, region -> AWSClientFactory.CreateAmazonCloudWatchClient(awsKey, awsSecret, RegionEndpoint.GetBySystemName region)
+=============================================================="
+======             Amazon.CloudWatch.Selector           ======"
+=============================================================="
+
+"""
+    
+    let region = match !region with
+                 | ""     -> RegionEndpoint.USEast1
+                 | region -> RegionEndpoint.GetBySystemName region
+
+    let cloudWatch = initClient !awsKey !awsSecret region
+
+    printfn "\nCloudWatch client initialized.\n"
 
     loop cloudWatch None
 
