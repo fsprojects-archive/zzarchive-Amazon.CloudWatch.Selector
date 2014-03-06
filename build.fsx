@@ -27,10 +27,12 @@ let tempDir  = "temp/"
 // The name of the project 
 // (used by attributes in AssemblyInfo, name of a NuGet package and directory in 'src')
 let project    = "Amazon.CloudWatch.Selector"
+let cliProject = "cwcli"
 
 // Short summary of the project
 // (used as description in AssemblyInfo and as a short summary for NuGet package)
-let summary = "Extension library for AWSSDK that allows you to select CloudWatch metrics with simple queries"
+let summary    = "Extension library for AWSSDK that allows you to select CloudWatch metrics with simple queries"
+let cliSummary = "CLI for querying metrics in Amazon CloudWatch using a simple DSL."
 
 // Longer description of the project
 // (used as a description for NuGet package; line breaks are automatically cleaned up)
@@ -75,6 +77,14 @@ Target "AssemblyInfo" (fun _ ->
         Attribute.Version       release.AssemblyVersion
         Attribute.FileVersion   release.AssemblyVersion
         Attribute.InternalsVisibleTo "Amazon.CloudWatch.Selector.Tests" ] 
+
+  let fileName = "src/CloudWatch.Selector.Cli/AssemblyInfo.fs"
+  CreateFSharpAssemblyInfo fileName
+      [ Attribute.Title         "AWS CloudWatch Selector CLI"
+        Attribute.Product       cliProject
+        Attribute.Description   cliSummary
+        Attribute.Version       release.AssemblyVersion
+        Attribute.FileVersion   release.AssemblyVersion ] 
 )
 
 // --------------------------------------------------------------------------------------
