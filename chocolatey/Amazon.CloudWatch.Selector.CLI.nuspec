@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>cwcli</id>
+    <title>AWS CloudWatch Selector CLI</title>
+    <version>@build.number@</version>
+    <authors>@authors@</authors>
+    <owners>@authors@</owners>
+    <licenseUrl>https://github.com/theburningmonk/Amazon.CloudWatch.Selector/blob/develop/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/theburningmonk/Amazon.CloudWatch.Selector</projectUrl>
+    <iconUrl>https://raw.github.com/theburningmonk/Amazon.CloudWatch.Selector/develop/nuget/logo.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>CLI for querying metrics in Amazon CloudWatch using a simple DSL.</summary>
+    <description>The AWS CloudWatch Selector CLI allows you to query against metrics stored in the Amazon CloudWatch service using a simple DSL.</description>
+    <releaseNotes>@releaseNotes@</releaseNotes>
+    <copyright>Copyright Yan Cui 2013</copyright>
+    <tags>@tags@</tags>
+  </metadata>
+  <files>
+    <file src="..\cli\*.*" />
+  </files>
+</package>

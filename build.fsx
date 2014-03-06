@@ -10,6 +10,7 @@ open Fake.ReleaseNotesHelper
 open System
 
 let buildDir = "build/"
+let cliDir   = "cli/"
 let testDir  = "test/"
 let tempDir  = "temp/"
 
@@ -25,11 +26,13 @@ let tempDir  = "temp/"
 
 // The name of the project 
 // (used by attributes in AssemblyInfo, name of a NuGet package and directory in 'src')
-let project = "Amazon.CloudWatch.Selector"
+let project    = "Amazon.CloudWatch.Selector"
+let cliProject = "cwcli"
 
 // Short summary of the project
 // (used as description in AssemblyInfo and as a short summary for NuGet package)
-let summary = "Extension library for AWSSDK that allows you to select CloudWatch metrics with simple queries"
+let summary    = "Extension library for AWSSDK that allows you to select CloudWatch metrics with simple queries"
+let cliSummary = "CLI for querying metrics in Amazon CloudWatch using a simple DSL."
 
 // Longer description of the project
 // (used as a description for NuGet package; line breaks are automatically cleaned up)
@@ -44,9 +47,11 @@ let tags = "F# fsharp aws amazon cloudwatch dsl"
 
 // File system information 
 // (<solutionFile>.sln is built during the building process)
-let projectFile  = "Amazon.CloudWatch.Selector.fsproj"
+let projectFile     = "Amazon.CloudWatch.Selector.fsproj"
+let testProjectFile = "Amazon.CloudWatch.Selector.Tests.fsproj"
+let cliProjectFile  = "Amazon.CloudWatch.Selector.Cli.fsproj"
 // Pattern specifying assemblies to be tested using NUnit
-let testAssemblies = ["tests/*/bin/*/CloudWatch.Selector*Tests*.dll"]
+let testAssemblies = ["tests/*/bin/*/Amazon.CloudWatch.Selector*Tests*.dll"]
 
 // Git configuration (used for publishing documentation in gh-pages branch)
 // The profile where the project is posted 
@@ -72,6 +77,14 @@ Target "AssemblyInfo" (fun _ ->
         Attribute.Version       release.AssemblyVersion
         Attribute.FileVersion   release.AssemblyVersion
         Attribute.InternalsVisibleTo "Amazon.CloudWatch.Selector.Tests" ] 
+
+  let fileName = "src/CloudWatch.Selector.Cli/AssemblyInfo.fs"
+  CreateFSharpAssemblyInfo fileName
+      [ Attribute.Title         "AWS CloudWatch Selector CLI"
+        Attribute.Product       cliProject
+        Attribute.Description   cliSummary
+        Attribute.Version       release.AssemblyVersion
+        Attribute.FileVersion   release.AssemblyVersion ] 
 )
 
 // --------------------------------------------------------------------------------------
@@ -80,7 +93,7 @@ Target "AssemblyInfo" (fun _ ->
 Target "RestorePackages" RestorePackages
 
 Target "Clean" (fun _ ->
-    CleanDirs [ buildDir; testDir; tempDir ]
+    CleanDirs [ buildDir; cliDir; testDir; tempDir ]
 )
 
 Target "CleanDocs" (fun _ ->
@@ -96,7 +109,8 @@ let files includes =
     Excludes = [] } 
 
 Target "Build" (fun _ ->
-    files [ "src/CloudWatch.Selector/" + projectFile ]
+    files [ "src/CloudWatch.Selector/" + projectFile
+            "tests/CloudWatch.Selector.Tests/" + testProjectFile ]
     |> MSBuildRelease buildDir "Rebuild"
     |> ignore
 )
@@ -147,6 +161,28 @@ Target "NuGet" (fun _ ->
         ("nuget/" + project + ".nuspec")
 )
 
+Target "Chocolatey-CLI" (fun _ ->
+    // Format the description to fit on a single line (remove \r\n and double-spaces)
+    let description = description.Replace("\r", "")
+                                 .Replace("\n", "")
+                                 .Replace("  ", " ")
+
+    NuGet (fun p -> 
+        { p with   
+            Authors = authors
+            Project = project
+            Summary = summary
+            Description = description
+            Version = release.NugetVersion
+            ReleaseNotes = String.Join(Environment.NewLine, release.Notes)
+            Tags = tags
+            OutputPath = "chocolatey"
+            AccessKey = getBuildParamOrDefault "nugetkey" ""
+            Publish = hasBuildParam "nugetkey"
+            Dependencies = [] })
+        ("chocolatey/" + project + ".CLI.nuspec")
+)
+
 // --------------------------------------------------------------------------------------
 // Generate the documentation
 
@@ -173,6 +209,17 @@ Target "ReleaseDocs" (fun _ ->
 Target "Release" DoNothing
 
 // --------------------------------------------------------------------------------------
+// Build CLI
+
+Target "BuildCLI" (fun _ ->
+    files [ "src/CloudWatch.Selector.Cli/" + cliProjectFile ]
+    |> MSBuildRelease cliDir "Rebuild"
+    |> ignore
+)
+
+Target "CLI" DoNothing
+
+// --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 
 Target "All" DoNothing
@@ -181,7 +228,8 @@ Target "All" DoNothing
   ==> "RestorePackages"
   ==> "AssemblyInfo"
   ==> "Build"
-//  ==> "RunTests"
+  ==> "BuildCLI"
+  ==> "RunTests"
   ==> "All"
 
 "All" 
@@ -189,6 +237,11 @@ Target "All" DoNothing
 //  ==> "GenerateDocs"
 //  ==> "ReleaseDocs"
   ==> "NuGet"
+  ==> "Chocolatey-CLI"
   ==> "Release"
+  
+"All"
+//  ==> "BuildCLI"
+  ==> "CLI"
 
 RunTargetOrDefault "All"

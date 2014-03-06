@@ -405,13 +405,9 @@ module Execution =
                 | TimeFrame.Last ts       -> now.Add(-ts), now
                 | TimeFrame.Since dt      -> dt, now
                 | TimeFrame.Between(a, b) -> a, b
-            req.StartTime <- startTime
-            req.EndTime   <- endTime
-
-            match getPeriod period with
-            | Some seconds -> req.Period <- int seconds
-            | _ -> ()
-            
+            req.StartTime  <- startTime
+            req.EndTime    <- endTime
+            req.Period     <- int <| defaultArg (getPeriod period) 60.0 // default to 1 minute            
             req.Statistics <- statistics
             req.Dimensions <- metric.Dimensions
 

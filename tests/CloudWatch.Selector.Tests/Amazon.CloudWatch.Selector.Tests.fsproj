@@ -8,7 +8,7 @@
     <ProjectGuid>5369ceaf-60ed-4c51-8c36-20e5332ac351</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>CloudWatch.Selector.Tests</RootNamespace>
-    <AssemblyName>CloudWatch.Selector.Tests</AssemblyName>
+    <AssemblyName>Amazon.CloudWatch.Selector.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Name>Amazon.CloudWatch.Selector.Tests</Name>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\src\CloudWatch.Selector\</SolutionDir>

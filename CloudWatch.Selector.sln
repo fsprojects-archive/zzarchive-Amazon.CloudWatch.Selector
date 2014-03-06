@@ -12,8 +12,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{89EFE3
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "project", "project", "{75D63101-ADBF-499B-BDB8-E49162E65798}"
 	ProjectSection(SolutionItems) = preProject
-		build.fsx = build.fsx
+		chocolatey\Amazon.CloudWatch.Selector.CLI.nuspec = chocolatey\Amazon.CloudWatch.Selector.CLI.nuspec
 		nuget\Amazon.CloudWatch.Selector.nuspec = nuget\Amazon.CloudWatch.Selector.nuspec
+		build.fsx = build.fsx
 		README.md = README.md
 		RELEASE_NOTES.md = RELEASE_NOTES.md
 	EndProjectSection
@@ -25,6 +26,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{818E9626-8FDC-40CD-ACC7-CFC580A82F8E}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CloudWatch.Selector.ExampleFs", "examples\CloudWatch.Selector.ExampleFs\CloudWatch.Selector.ExampleFs.fsproj", "{57AD9538-45B0-49F3-9462-F74C3C4F54AA}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Amazon.CloudWatch.Selector.Cli", "src\CloudWatch.Selector.Cli\Amazon.CloudWatch.Selector.Cli.fsproj", "{B7A3BA90-4878-4D22-B93D-79460AEB5E4F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +47,10 @@ Global
 		{57AD9538-45B0-49F3-9462-F74C3C4F54AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57AD9538-45B0-49F3-9462-F74C3C4F54AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57AD9538-45B0-49F3-9462-F74C3C4F54AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7A3BA90-4878-4D22-B93D-79460AEB5E4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7A3BA90-4878-4D22-B93D-79460AEB5E4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7A3BA90-4878-4D22-B93D-79460AEB5E4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7A3BA90-4878-4D22-B93D-79460AEB5E4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
