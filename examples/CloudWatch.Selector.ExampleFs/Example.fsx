@@ -1,5 +1,5 @@
-﻿#r "bin/Debug/AWSSDK.dll"
-#r "bin/Debug/Amazon.CloudWatch.Selector.dll"
+﻿#r "bin/AWSSDK.dll"
+#r "bin/Amazon.CloudWatch.Selector.dll"
 
 open Amazon
 
