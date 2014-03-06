@@ -82,7 +82,16 @@ let draw (state : (Metric * List<Datapoint>)[]) =
     Process.Start(outputFile) |> ignore
 
 let rec loop (cloudWatch : IAmazonCloudWatch) (state : (Metric * List<Datapoint>)[] option) = 
-    let prefix = "\nselector> "
+    let prefix = "\ncwcli> "
+
+    let execQuery (cloudWatch : IAmazonCloudWatch) (query : string) =
+        printfn "%sRunning... (might take a minute)" prefix
+
+        try 
+            cloudWatch.Select query |> Async.RunSynchronously |> Some
+        with
+        | exn -> printfn "%sError: %A" prefix exn
+                 None
 
     printf "%s" prefix
     match Console.ReadLine() with
@@ -107,17 +116,19 @@ All other inputs are treated as a query, go to http://bit.ly/awscwcli to learn m
             printfn "%sPlease run a query first" prefix
             loop cloudWatch state   
     | query -> 
-        printfn "%sRunning... (might take a minute)" prefix
-        let state = cloudWatch.Select query |> Async.RunSynchronously
+        let state = execQuery cloudWatch query
 
-        printfn "%sFound %d metrics" prefix state.Length
-        for (metric, _) in state do
-            printfn "Namespace : %s | Name : %s | Dimensions : [ %s ]" 
-                    metric.Namespace 
-                    metric.MetricName 
-                    (metric.Dimensions |> Seq.map (fun dim -> sprintf "%s:%s" dim.Name dim.Value) |> csv)
+        match state with
+        | Some results ->
+            printfn "%sFound %d metrics" prefix results.Length
+            for (metric, _) in results do
+                printfn "Namespace : %s | Name : %s | Dimensions : [ %s ]" 
+                        metric.Namespace 
+                        metric.MetricName 
+                        (metric.Dimensions |> Seq.map (fun dim -> sprintf "%s:%s" dim.Name dim.Value) |> csv)
+        | _ -> ()
         
-        loop cloudWatch (Some state)
+        loop cloudWatch state
 
 let rec initClient (awsKey : string) (awsSecret : string) (region : RegionEndpoint) =
     try
