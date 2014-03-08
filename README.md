@@ -19,7 +19,7 @@ For example, to answer the question such as
 
 you can write a query like this in F#:
 ```fsharp
-open Amazon
+open Amazon[https://chocolatey.org/](https://chocolatey.org/)
 open Amazon.CloudWatch.Selector
 
 let awsKey     = "YOUR_AWS_KEY"
@@ -120,10 +120,15 @@ Coming soon.
 
 ### Using the CLI
 
-To start the CLI:
+You can get the CLI tool using [Chocolatey](https://chocolatey.org/):
 
-1. set the AWS key and secret, and region for your account in the **start_cli.cmd** script
-2. run the **start_cli.cmd** script (this will build the solution and then start the CLI)
+[![Chocolatey](https://raw.github.com/theburningmonk/Amazon.CloudWatch.Selector/develop/chocolatey/banner.png)](https://chocolatey.org/packages/cwcli)
+
+
+1. install the CLI using Chocolatey
+2. enter `cwcli` in command line
+3. follow instructions to enter credential for your AWS account
+4. run queries! 
 
 Suppose you want to find CPU metrics for your `Amazon ElastiCache` clusters whose max CPU went over 30% at any point over the last 24 hours, you could write a query like this:
 
