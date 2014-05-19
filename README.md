@@ -19,7 +19,7 @@ For example, to answer the question such as
 
 you can write a query like this in F#:
 ```fsharp
-open Amazon[https://chocolatey.org/](https://chocolatey.org/)
+open Amazon
 open Amazon.CloudWatch.Selector
 
 let awsKey     = "YOUR_AWS_KEY"
