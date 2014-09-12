@@ -51,7 +51,7 @@ let projectFile     = "Amazon.CloudWatch.Selector.fsproj"
 let testProjectFile = "Amazon.CloudWatch.Selector.Tests.fsproj"
 let cliProjectFile  = "Amazon.CloudWatch.Selector.Cli.fsproj"
 // Pattern specifying assemblies to be tested using NUnit
-let testAssemblies = ["tests/*/bin/*/Amazon.CloudWatch.Selector*Tests*.dll"]
+let testAssemblies = ["build/Amazon.CloudWatch.Selector*Tests*.dll"]
 
 // Git configuration (used for publishing documentation in gh-pages branch)
 // The profile where the project is posted 
