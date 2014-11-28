@@ -6,6 +6,12 @@ This library provides both internal and external DSL for querying against metric
 As part of the repo, there is also a simple **CLI tool** which you can use to interactively query your `CloudWatch` metrics using the external DSL and plot the resulting metrics on a graph.
 
 
+### Maintainer(s)
+
+- [@theburningmonk](https://github.com/theburningmonk)
+
+The default maintainer account for projects under "fsprojects" is [@fsgit](https://github.com/fsgit) - F# Community Project Incubation Space (repo management)
+
 
 ### Getting Started
 
