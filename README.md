@@ -1,3 +1,6 @@
+[![Issue Stats](http://issuestats.com/github/fsprojects/Amazon.CloudWatch.Selector/badge/issue)](http://issuestats.com/github/fsprojects/Amazon.CloudWatch.Selector)
+[![Issue Stats](http://issuestats.com/github/fsprojects/Amazon.CloudWatch.Selector/badge/pr)](http://issuestats.com/github/fsprojects/Amazon.CloudWatch.Selector)
+
 Amazon.CloudWatch.Query
 =======================
 
@@ -16,6 +19,7 @@ The default maintainer account for projects under "fsprojects" is [@fsgit](https
 ### Getting Started
 
 To get started, download the library from Nuget.
+[![NuGet Status](http://img.shields.io/nuget/v/Amazon.CloudWatch.Selector.svg?style=flat)](https://www.nuget.org/packages/Amazon.CloudWatch.Selector/)
 [![Nuget](https://raw.github.com/theburningmonk/Amazon.CloudWatch.Selector/develop/nuget/banner.png)](https://www.nuget.org/packages/Amazon.CloudWatch.Selector)
 
 You can then use both the internal and external DSL via extension methods on an `IAmazonCloudWatch` instance.
