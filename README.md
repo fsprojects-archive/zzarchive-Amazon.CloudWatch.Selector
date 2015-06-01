@@ -13,7 +13,7 @@ As part of the repo, there is also a simple **CLI tool** which you can use to in
 
 - [@theburningmonk](https://github.com/theburningmonk)
 
-The default maintainer account for projects under "fsprojects" is [@fsgit](https://github.com/fsgit) - F# Community Project Incubation Space (repo management)
+The default maintainer account for projects under "fsprojects" is [@fsprojectsgit](https://github.com/fsprojectsgit) - F# Community Project Incubation Space (repo management)
 
 
 ### Getting Started
